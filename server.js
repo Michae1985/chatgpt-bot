@@ -11,6 +11,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+app.get("/", (req, res) => {
+  res.send("Chatbotten kører! Send POST-anmodning til /chat");
+});
+
 app.post("/chat", async (req, res) => {
   const message = req.body.message;
 
@@ -26,6 +30,10 @@ res.json({ reply });
     console.error("Fejl:", error);
     res.status(500).json({ error: error.message });
   }
+});
+
+app.get('/', (req, res) => {
+  res.send('Chatbotten er online og klar!');
 });
 
 app.listen(3000, () => {
