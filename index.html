@@ -6,83 +6,109 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 0;
+      background-color: #efefef;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
+      padding: 50px;
     }
-
-    .container {
-      background: #ffffff;
-      width: 100%;
-      max-width: 600px;
-      margin-top: 50px;
-      padding: 20px;
+    .chat-container {
+      background-color: white;
+      padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 500px;
     }
-
-    h1 {
+    h2 {
       text-align: center;
       margin-bottom: 20px;
     }
-
-    #chatbox {
-      min-height: 200px;
-      margin-bottom: 20px;
-      padding: 10px;
+    .chat-box {
       border: 1px solid #ccc;
-      border-radius: 6px;
-      background: #fafafa;
+      padding: 15px;
+      height: 300px;
       overflow-y: auto;
-      max-height: 300px;
+      margin-bottom: 15px;
+      white-space: pre-line;
     }
-
-    .user {
-      color: #2c3e50;
-      font-weight: bold;
+    .input-container {
+      display: flex;
     }
-
-    .bot {
-      color: #27ae60;
-      font-weight: bold;
-    }
-
     input[type="text"] {
-      width: 75%;
+      flex: 1;
       padding: 10px;
-      font-size: 1rem;
+      font-size: 14px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 5px 0 0 5px;
     }
-
     button {
-      padding: 10px 15px;
-      font-size: 1rem;
-      background-color: #27ae60;
-      color: white;
+      padding: 10px 20px;
+      font-size: 14px;
       border: none;
-      border-radius: 5px;
-      margin-left: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 0 5px 5px 0;
       cursor: pointer;
     }
-
     button:hover {
-      background-color: #219150;
+      background-color: #45a049;
+    }
+    strong {
+      display: block;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Test din chatbot</h1>
-    <div id="chatbox"></div>
-    <input type="text" id="userInput" placeholder="Skriv din besked her..." />
-    <button onclick="sendMessage()">Send</button>
+  <div class="chat-container">
+    <h2>Test din chatbot</h2>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="input-container">
+      <input type="text" id="userInput" placeholder="Skriv din besked her..." />
+      <button id="sendButton">Send</button>
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const userInput = document.getElementById("userInput");
+    const sendButton = document.getElementById("sendButton");
+
+    function appendMessage(sender, text) {
+      const messageElement = document.createElement("div");
+      messageElement.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatBox.appendChild(messageElement);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = userInput.value;
+      if (!message.trim()) return;
+
+      appendMessage("Dig", message);
+      userInput.value = "";
+
+      try {
+        const response = await fetch("/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message }),
+        });
+
+        const data = await response.json();
+        appendMessage("ChatGPT", data.reply);
+      } catch (error) {
+        appendMessage("ChatGPT", "Der opstod en fejl.");
+      }
+    }
+
+    sendButton.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
 </body>
 </html>
