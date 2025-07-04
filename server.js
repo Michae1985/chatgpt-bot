@@ -11,12 +11,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.get("/status", (req, res) => {
-  res.send("Chatbotten er online og klar!");
-});
-
-const path = require("path");
-
 // Server forsiden
 const path = require("path");
 
